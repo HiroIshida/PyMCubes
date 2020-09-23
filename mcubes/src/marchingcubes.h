@@ -28,6 +28,39 @@ size_t mc_add_vertex(double x1, double y1, double z1, double c2,
 struct TableManager
 {
     public:
+        std::vector<std::vector<uint>> neighbor_table;
+        std::vector<uint> neighbor_num_table;
+        TableManager(int n1, int n2, int n3){
+            int n_vert_max = n1*n2*n3;
+            int n_neighbor_max = 8; // due to marching cube's property (don't proved yet, but emperically)
+
+            std::vector<uint> neighbor_lst(n_neighbor_max, -1);
+            neighbor_table = std::vector<std::vector<uint>>(n_vert_max, neighbor_lst);
+            neighbor_num_table = std::vector<uint>(n_vert_max, 0);
+        }
+
+        void add_element(uint key, uint elem){
+            int idx = neighbor_num_table[key];
+            neighbor_table[key][idx] = elem;
+            neighbor_num_table[key]++;
+        }
+
+        void copy_valid_elements(std::vector<long unsigned int>& neighbor){
+            int vert_idx = 0;
+            while(true){
+                int neighbor_num = neighbor_num_table[vert_idx];
+                if(neighbor_num == 0){
+                    break;
+                }
+                for(int i; i<neighbor_num; i++){
+                    neighbor.push_back(neighbor_table[vert_idx][i]);
+                }
+                vert_idx++;
+            }
+        }
+
+
+        /*
         std::unordered_map<uint, std::vector<uint>> triangle_table;
         TableManager() : triangle_table(std::unordered_map<uint, std::vector<uint>>()){}
 
@@ -41,6 +74,7 @@ struct TableManager
                 triangle_table[key] = vec;
             }
         }
+        */
 
 };
 
@@ -62,6 +96,8 @@ void marching_cubes(const vector3& lower, const vector3& upper,
                    [](double a, double b)->bool {return a <= b;}))
         return;
 
+    TableManager tm(numx, numy, numz);
+
     // numx, numy and numz are the numbers of evaluations in each direction
     --numx; --numy; --numz;
 
@@ -75,7 +111,6 @@ void marching_cubes(const vector3& lower, const vector3& upper,
     std::vector<size_type> shared_indices_z(num_shared_indices);
     auto _offset = [&](size_t i, size_t j, size_t k){return i*(numy+1)*(numz+1) + j*(numz+1) + k;};
 
-    TableManager tm;
 
     for(int i=0; i<numx; ++i)
     {
@@ -237,12 +272,12 @@ void marching_cubes(const vector3& lower, const vector3& upper,
 
                     int idx_polygon = (polygons.size() - 1)/ 3;
                     tm.add_element(idx_vertex, idx_polygon);
-
-                    neighbor.push_back(indices[tri]); //dummy
+                    //neighbor.push_back(indices[tri]); //dummy
                 }
             }
         }
     }
+    tm.copy_valid_elements(neighbor);
 
 }
 
