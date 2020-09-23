@@ -19,14 +19,14 @@ __all__ = [
 ]
 
 
-def _build_variable_indices(band: np.ndarray) -> np.ndarray:
+def _build_variable_indices(band): 
     num_variables = np.count_nonzero(band)
     variable_indices = np.full(band.shape, -1, dtype=np.int_)
     variable_indices[band] = np.arange(num_variables)
     return variable_indices
 
 
-def _buildq3d(variable_indices: np.ndarray):
+def _buildq3d(variable_indices):
     """
     Builds the filterq matrix for the given variables.
     """
@@ -90,7 +90,7 @@ def _buildq3d(variable_indices: np.ndarray):
     return filterq.T.dot(filterq)
 
 
-def _buildq2d(variable_indices: np.ndarray):
+def _buildq2d(variable_indices):
     """
     Builds the filterq matrix for the given variables.
 
@@ -144,12 +144,12 @@ def _buildq2d(variable_indices: np.ndarray):
 
 def _jacobi(
         filterq,
-        x0: np.ndarray,
-        lower_bound: np.ndarray,
-        upper_bound: np.ndarray,
-        max_iters: int = 10,
-        rel_tol: float = 1e-6,
-        weight: float = 0.5):
+        x0,
+        lower_bound,
+        upper_bound,
+        max_iters = 10,
+        rel_tol = 1e-6,
+        weight = 0.5):
     """Jacobi method with constraints."""
 
     jacobi_r = sparse.lil_matrix(filterq)
@@ -192,9 +192,9 @@ def _jacobi(
 
 
 def signed_distance_function(
-        levelset: np.ndarray,
-        band_radius: int
-        ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+        levelset,
+        band_radius
+        ):
     """
     Return the distance to the 0.5 levelset of a function, the mask of the
     border (i.e., the nearest cells to the 0.5 level-set) and the mask of the
@@ -218,11 +218,11 @@ def signed_distance_function(
 
 
 def smooth_constrained(
-        binary_array: np.ndarray,
-        band_radius: int = 4,
-        max_iters: int = 500,
-        rel_tol: float = 1e-6
-        ) -> np.ndarray:
+        binary_array,
+        band_radius = 4,
+        max_iters = 500,
+        rel_tol = 1e-6
+        ): 
     """
     Implementation of the smoothing method from
 
@@ -269,16 +269,16 @@ def smooth_constrained(
     return res
 
 
-def smooth_gaussian(binary_array: np.ndarray, sigma: float = 3) -> np.ndarray:
+def smooth_gaussian(binary_array, sigma = 3):
     vol = np.float_(binary_array) - 0.5
     return ndi.gaussian_filter(vol, sigma=sigma)
 
 
 def smooth(
-        binary_array: np.ndarray,
-        method: str = 'auto',
+        binary_array,
+        method = 'auto',
         **kwargs
-        ) -> np.ndarray:
+        ):
     """
     Smooths the 0.5 level-set of a binary array. Returns a floating-point
     array with a smoothed version of the original level-set in the 0 isovalue.
