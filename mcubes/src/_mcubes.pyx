@@ -19,10 +19,11 @@ cdef extern from "pywrapper.h":
 
 def marching_cubes(np.ndarray volume, float isovalue):
     
-    verts, faces = c_marching_cubes(volume, isovalue)
+    verts, faces, neighbors = c_marching_cubes(volume, isovalue)
     verts.shape = (-1, 3)
     faces.shape = (-1, 3)
-    return verts, faces
+    neighbors.shape = (-1, 3)
+    return verts, faces, neighbors
 
 def marching_cubes_func(tuple lower, tuple upper, int numx, int numy, int numz, object f, double isovalue):
     

@@ -206,8 +206,10 @@ void marching_cubes(const vector3& lower, const vector3& upper,
 
                 int tri;
                 int* triangle_table_ptr = triangle_table[cubeindex];
-                for(int m=0; tri = triangle_table_ptr[m], tri != -1; ++m)
+                for(int m=0; tri = triangle_table_ptr[m], tri != -1; ++m){
                     polygons.push_back(indices[tri]);
+                    neighbor.push_back(indices[tri]);
+                }
             }
         }
     }
