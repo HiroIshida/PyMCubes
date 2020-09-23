@@ -5,12 +5,14 @@
 #include <stddef.h>
 #include <array>
 #include <vector>
+#include <unordered_map>
 
 namespace mc
 {
 
 extern int edge_table[256];
 extern int triangle_table[256][16];
+using uint = unsigned int;
 
 namespace private_
 {
@@ -20,6 +22,25 @@ double mc_isovalue_interpolation(double isovalue, double f1, double f2,
 size_t mc_add_vertex(double x1, double y1, double z1, double c2,
     int axis, double f1, double f2, double isovalue, std::vector<double>* vertices);
 }
+
+struct TableManager
+{
+    public:
+        std::unordered_map<uint, std::vector<uint>> triangle_table;
+        TableManager() : triangle_table(std::unordered_map<uint, std::vector<uint>>()){}
+
+        void add_element(uint key, uint elem){
+            auto it = triangle_table.find(key);
+            bool key_exist = (it != triangle_table.end());
+            if(key_exist){
+                it->second.push_back(elem);
+            }else{
+                std::vector<uint> vec = {elem};
+                triangle_table[key] = vec;
+            }
+        }
+
+};
 
 template<typename vector3, typename formula>
 void marching_cubes(const vector3& lower, const vector3& upper,
