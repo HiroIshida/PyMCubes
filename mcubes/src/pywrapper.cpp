@@ -12,6 +12,7 @@ PyObject* marching_cubes_func(PyObject* lower, PyObject* upper,
 {
     std::vector<double> vertices;
     std::vector<size_t> polygons;
+    std::vector<size_t> neighbors;
     
     // Copy the lower and upper coordinates to a C array.
     std::array<double,3> lower_;
@@ -51,7 +52,8 @@ PyObject* marching_cubes_func(PyObject* lower, PyObject* upper,
     };
     
     // Marching cubes.
-    mc::marching_cubes(lower_, upper_, numx, numy, numz, pyfunc_to_cfunc, isovalue, vertices, polygons);
+    mc::marching_cubes(lower_, upper_, numx, numy, numz, pyfunc_to_cfunc, isovalue, 
+            vertices, polygons, neighbors);
     
     // Copy the result to two Python ndarrays.
     npy_intp size_vertices = vertices.size();
@@ -87,6 +89,7 @@ PyObject* marching_cubes(PyArrayObject* arr, double isovalue)
     long numz = upper[2] - lower[2] + 1;
     std::vector<double> vertices;
     std::vector<size_t> polygons;
+    std::vector<size_t> neighbors;
     
     auto pyarray_to_cfunc = [&](long x, long y, long z) -> double {
         const npy_intp c[3] = {x, y, z};
@@ -95,7 +98,7 @@ PyObject* marching_cubes(PyArrayObject* arr, double isovalue)
 
     // Marching cubes.
     mc::marching_cubes(lower, upper, numx, numy, numz, pyarray_to_cfunc, isovalue,
-                        vertices, polygons);
+                        vertices, polygons, neighbors);
     
     // Copy the result to two Python ndarrays.
     npy_intp size_vertices = vertices.size();
