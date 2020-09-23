@@ -6,6 +6,8 @@
 #include <array>
 #include <vector>
 #include <unordered_map>
+#include <iostream> // delete later
+using namespace std; // delete later
 
 namespace mc
 {
@@ -72,6 +74,8 @@ void marching_cubes(const vector3& lower, const vector3& upper,
     std::vector<size_type> shared_indices_y(num_shared_indices);
     std::vector<size_type> shared_indices_z(num_shared_indices);
     auto _offset = [&](size_t i, size_t j, size_t k){return i*(numy+1)*(numz+1) + j*(numz+1) + k;};
+
+    TableManager tm;
 
     for(int i=0; i<numx; ++i)
     {
@@ -228,8 +232,13 @@ void marching_cubes(const vector3& lower, const vector3& upper,
                 int tri;
                 int* triangle_table_ptr = triangle_table[cubeindex];
                 for(int m=0; tri = triangle_table_ptr[m], tri != -1; ++m){
-                    polygons.push_back(indices[tri]);
-                    neighbor.push_back(indices[tri]);
+                    int idx_vertex = indices[tri];
+                    polygons.push_back(idx_vertex);
+
+                    int idx_polygon = (polygons.size() - 1)/ 3;
+                    tm.add_element(idx_vertex, idx_polygon);
+
+                    neighbor.push_back(indices[tri]); //dummy
                 }
             }
         }
